@@ -1,0 +1,8 @@
+.idea/
+*.iml
+
+.DS_Store
+
+# Golang specific file
+vendor/*
+main
