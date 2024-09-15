@@ -6,6 +6,7 @@ type XLSXContent struct {
 	TotalInvestment     float64
 	TotalPortfolioValue float64
 	PortfolioXIRR       float64
+	UserDetails         *UserDetails
 	SchemeDetails       map[string]*SchemeDetail
 }
 
@@ -29,4 +30,13 @@ type TransactionDetail struct {
 	NAV                    float64
 	Units                  float64
 	Amount                 float64
+}
+
+type UserDetails struct {
+	Name         string
+	MobileNumber string
+	Email        string
+	PAN          string
+	FromDate     time.Time
+	ToDate       time.Time
 }

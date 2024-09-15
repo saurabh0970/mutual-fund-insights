@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/araddon/dateparse"
 	"github.com/xuri/excelize/v2"
-	"scrpits/consts"
-	"scrpits/structs"
-	"scrpits/validator"
+	"mutual-fund-insights/consts"
+	"mutual-fund-insights/structs"
+	"mutual-fund-insights/validator"
 	"strconv"
 )
 
@@ -30,12 +30,13 @@ func GetXLSXContentFromFilename(fileName string) (resp *structs.XLSXContent, err
 	portfolioDetailsSheet, err := excelFile.GetRows(consts.SheetPortfolioDetails)
 	validator.Must(err)
 
-	totalPortfolioValue := fillSchemeDetails(portfolioDetailsSheet, schemeNameToSchemeDetailsMap)
+	totalPortfolioValue, userDetails := fillSchemeDetails(portfolioDetailsSheet, schemeNameToSchemeDetailsMap)
 
 	transactionDetailsSheet, err := excelFile.GetRows(consts.SheetTransactionDetails)
 	validator.Must(err)
 	totalInvestment := fillTransactionDetails(transactionDetailsSheet, schemeNameToSchemeDetailsMap)
 
+	resp.UserDetails = userDetails
 	resp.TotalInvestment = totalInvestment
 	resp.SchemeDetails = schemeNameToSchemeDetailsMap
 	resp.TotalPortfolioValue = totalPortfolioValue
@@ -73,9 +74,12 @@ func fillTransactionDetails(transactionDetailsSheet [][]string, schemeNameToSche
 	return totalInvestment
 }
 
-func fillSchemeDetails(portfolioDetailsSheet [][]string, schemeNameToSchemeDetailsMap map[string]*structs.SchemeDetail) float64 {
+func fillSchemeDetails(portfolioDetailsSheet [][]string, schemeNameToSchemeDetailsMap map[string]*structs.SchemeDetail) (float64, *structs.UserDetails) {
 	reachedSchemeDetailRows := false
 	totalPortfolioValue := -1.0
+	userDetails := &structs.UserDetails{
+		Name: "Investor",
+	}
 	for i, val := range portfolioDetailsSheet {
 		if reachedSchemeDetailRows {
 			currFolioNum, err := strconv.ParseInt(val[3], 10, 64)
@@ -106,15 +110,29 @@ func fillSchemeDetails(portfolioDetailsSheet [][]string, schemeNameToSchemeDetai
 			}
 		} else if len(val) >= 1 && val[0] == consts.ColNameSchemeName {
 			reachedSchemeDetailRows = true
-		} else if totalPortfolioValue == -1 {
-			if validateForTotalPortfolioValue(val, portfolioDetailsSheet, i) {
-				totalPortValue, err := strconv.ParseFloat(portfolioDetailsSheet[i+1][1], 64)
-				validator.Must(err)
-				totalPortfolioValue = totalPortValue
-			}
+		} else if totalPortfolioValue == -1 && validateForTotalPortfolioValue(val, portfolioDetailsSheet, i) {
+			totalPortValue, err := strconv.ParseFloat(portfolioDetailsSheet[i+1][1], 64)
+			validator.Must(err)
+			totalPortfolioValue = totalPortValue
+		} else if len(val) >= 2 && val[0] == consts.LabelToDate {
+			toDate, err := dateparse.ParseAny(val[1])
+			validator.Must(err)
+			userDetails.ToDate = toDate
+		} else if len(val) >= 2 && val[0] == consts.LabelFromDate {
+			fromDate, err := dateparse.ParseAny(val[1])
+			validator.Must(err)
+			userDetails.FromDate = fromDate
+		} else if len(val) >= 2 && val[0] == consts.LabelPAN {
+			userDetails.PAN = val[1]
+		} else if len(val) >= 2 && val[0] == consts.LabelEmail {
+			userDetails.Email = val[1]
+		} else if len(val) >= 2 && val[0] == consts.LabelMobileNumber {
+			userDetails.MobileNumber = val[1]
+		} else if len(val) >= 2 && val[0] == consts.LabelName {
+			userDetails.Name = val[1]
 		}
 	}
-	return totalPortfolioValue
+	return totalPortfolioValue, userDetails
 }
 
 func validateForTotalPortfolioValue(val []string, portfolioDetailsSheet [][]string, i int) bool {

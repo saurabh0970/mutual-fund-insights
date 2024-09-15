@@ -1,0 +1,1 @@
+go build . && ./mutual-fund-insights run report.xlsx

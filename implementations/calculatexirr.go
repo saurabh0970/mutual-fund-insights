@@ -2,9 +2,9 @@ package implementations
 
 import (
 	"github.com/maksim77/goxirr"
-	"scrpits/process"
-	"scrpits/structs"
-	"scrpits/validator"
+	"mutual-fund-insights/process"
+	"mutual-fund-insights/structs"
+	"mutual-fund-insights/validator"
 	"time"
 )
 
@@ -13,7 +13,6 @@ func CalculateXIRR(fileName string) (*structs.XLSXContent, error) {
 	validator.Must(err)
 
 	allTransactions := make([]goxirr.Transaction, 0)
-
 	for _, schemeDetail := range xlsxContent.SchemeDetails {
 		currTransactions := make([]goxirr.Transaction, len(schemeDetail.TransactionDetails)+1)
 		for i, transactionDetail := range schemeDetail.TransactionDetails {

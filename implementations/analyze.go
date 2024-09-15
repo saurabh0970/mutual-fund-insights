@@ -3,11 +3,11 @@ package implementations
 import (
 	"fmt"
 	"github.com/punithck/indianmoney"
-	"scrpits/structs"
+	"mutual-fund-insights/structs"
 )
 
 func AnalyzePortfolio(xlsxContent *structs.XLSXContent) {
-
+	fmt.Printf("Hi %v!\n", xlsxContent.UserDetails.Name)
 	fmt.Printf("Till date, you have invested ₹%v combined \n", indianmoney.FormatMoneyFloat64(xlsxContent.TotalInvestment, 2))
 	fmt.Printf("Your Total Portfolio Value is: ₹%v \n", indianmoney.FormatMoneyFloat64(xlsxContent.TotalPortfolioValue, 2))
 	fmt.Printf("Current XIRR for your portfolio is %v%%\n\n", xlsxContent.PortfolioXIRR)

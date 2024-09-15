@@ -1,12 +1,9 @@
 package main
 
 import (
-	"scrpits/implementations"
-	"scrpits/validator"
+	"mutual-fund-insights/cmd"
 )
 
 func main() {
-	xlsxContent, err := implementations.CalculateXIRR("report.xlsx")
-	validator.Must(err)
-	implementations.AnalyzePortfolio(xlsxContent)
+	cmd.Execute()
 }
