@@ -1,6 +1,6 @@
 .idea/
 *.iml
-report.xlsx
+report-mine.xlsx
 .DS_Store
 
 # Golang specific file
